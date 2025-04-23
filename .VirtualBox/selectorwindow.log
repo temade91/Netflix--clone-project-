@@ -1,0 +1,19 @@
+00:00:02.537635 VirtualBox GUI VM Selector Window 7.0.8 r156879 win.amd64 (Apr 17 2023 16:42:53) release log
+00:00:02.537638 Log opened 2025-03-09T19:34:15.941465700Z
+00:00:02.537640 Build Type: release
+00:00:02.537644 OS Product: Windows 10
+00:00:02.537645 OS Release: 10.0.19045
+00:00:02.537646 OS Service Pack: 
+00:00:02.558845 DMI Product Name: Latitude 7480
+00:00:02.565505 DMI Product Version: 
+00:00:02.565524 Firmware type: BIOS
+00:00:02.565535 Host RAM: 16007MB (15.6GB) total, 5712MB (5.5GB) available
+00:00:02.565543 Executable: C:\Program Files\Oracle\VirtualBox\VirtualBox.exe
+00:00:02.565544 Process ID: 8984
+00:00:02.565544 Package type: WINDOWS_64BITS_GENERIC
+00:00:02.565716 Qt version: 5.15.2
+00:00:02.566482 GUI: UIMediumEnumerator: Initial medium-enumeration finished!
+00:00:02.675889 GUI: UIMediumEnumerator: Medium-enumeration started...
+00:00:07.534781 GUI: UIMediumEnumerator: Medium-enumeration finished!
+00:18:16.154433 GUI: UICommon: Commit data request...
+00:18:16.426386 GUI: UICommon: Handling aboutToQuit request..
