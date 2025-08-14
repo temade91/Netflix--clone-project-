@@ -1,21 +1,21 @@
-## Description
-Clearly and concisely describe the issue.
+---
+name: Bug Report
+about: Report a bug to help improve the project
+title: "[BUG]"
+labels: bug
+assignees: ''
+---
 
-## Steps to Reproduce
+**Describe the bug**
+A clear and concise description of what the bug is.
+
+**Steps to Reproduce**
 1. Go to '...'
 2. Click on '...'
-3. See error
+3. Observe issue
 
-## Expected Behavior
-What you expected to happen.
+**Expected behavior**
+What did you expect to happen?
 
-## Actual Behavior
-What actually happened.
-
-## Environment
-- OS: [e.g., Windows 11]
-- Browser: [e.g., Chrome 115]
-- Version: [e.g., 1.0.2]
-
-## Additional Context
-Add any extra details or screenshots here.
+**Additional context**
+Add any other context or screenshots here.
