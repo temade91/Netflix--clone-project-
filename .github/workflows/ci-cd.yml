@@ -82,6 +82,7 @@ jobs:
             echo "namespace=prod" >> $GITHUB_ENV
           else
             echo "namespace=dev" >> $GITHUB_ENV
+          fi  
 
       # 1️⃣1️⃣ Create namespace if missing
       - name: Create namespace if missing
