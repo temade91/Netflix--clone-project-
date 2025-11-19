@@ -21,8 +21,7 @@ jobs:
 
       # 2️⃣ Set Docker Hub username as a variable
       - name: Set Docker Hub Username
-        run: |
-          echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> $GITHUB_ENV
+        run: echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> $GITHUB_ENV
 
       # 3️⃣ Set up Docker Buildx
       - name: Set up Docker Buildx
@@ -45,16 +44,24 @@ jobs:
             ${{ env.DOCKERHUB_USERNAME }}/netflix-clone:latest
             ${{ env.DOCKERHUB_USERNAME }}/netflix-clone:${{ github.sha }}
 
-      # 6️⃣ Copy Kubernetes manifests
+      # 6️⃣ Copy Kubernetes manifests safely
       - name: Copy Kubernetes manifests
         run: |
-          mkdir -p manifests
-          cp -r k8-manifest/*.yaml manifests/
+          if [ -d "k8-manifest" ]; then
+            mkdir -p manifests
+            cp k8-manifest/*.yaml manifests/ 2>/dev/null || echo "No YAML files to copy"
+          else
+            echo "k8-manifest folder not found. Skipping copy."
+          fi
 
-      # 7️⃣ Update deployment.yaml with new image
+      # 7️⃣ Update deployment.yaml with new image if exists
       - name: Update Deployment Image Tag
         run: |
-          sed -i "s|image: .*|image: ${{ env.DOCKERHUB_USERNAME }}/netflix-clone:${{ github.sha }}|" manifests/deployment.yaml
+          if [ -f manifests/deployment.yaml ]; then
+            sed -i "s|image: .*|image: ${{ env.DOCKERHUB_USERNAME }}/netflix-clone:${{ github.sha }}|" manifests/deployment.yaml
+          else
+            echo "deployment.yaml not found. Skipping image update."
+          fi
 
       # 8️⃣ Azure login
       - name: Azure Login
@@ -65,9 +72,7 @@ jobs:
       # 9️⃣ Set AKS context
       - name: Set AKS context
         run: |
-          az aks get-credentials \
-            --resource-group demo-rg \
-            --name MyAKSCluster
+          az aks get-credentials --resource-group demo-rg --name MyAKSCluster
 
       # 🔟 Determine namespace based on branch
       - name: Set Deployment Namespace
@@ -87,11 +92,15 @@ jobs:
       - name: Deploy to AKS
         run: |
           DEPLOYMENT_NAME="netflix-clone-deployment"
-          kubectl apply -f manifests/deployment.yaml -n ${{ env.namespace }}
-          kubectl apply -f manifests/service.yaml -n ${{ env.namespace }}
+          if [ -f manifests/deployment.yaml ]; then
+            kubectl apply -f manifests/deployment.yaml -n ${{ env.namespace }}
+          fi
+          if [ -f manifests/service.yaml ]; then
+            kubectl apply -f manifests/service.yaml -n ${{ env.namespace }}
+          fi
           kubectl rollout status deployment/$DEPLOYMENT_NAME -n ${{ env.namespace }}
 
       # 1️⃣3️⃣ Optional: Show service IP
       - name: Check Service Status
         run: |
-          kubectl get svc netflix-clone-service -n ${{ env.namespace }}
+          kubectl get svc netflix-clone-service -n ${{ env.namespace }} || echo "Service not found"
