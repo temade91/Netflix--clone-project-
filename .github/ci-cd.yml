@@ -1,0 +1,93 @@
+name: Build, Push, and Deploy Netflix Clone
+
+on:
+  push:
+    branches:
+      - master   # Prod deployment
+      - release  # Dev deployment
+
+jobs:
+  build-push-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2️⃣ Set Docker Hub username as a variable
+      - name: Set Docker Hub Username
+        run: |
+          echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> $GITHUB_ENV
+
+      # 3️⃣ Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 4️⃣ Docker login
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 5️⃣ Build and push Docker image
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.DOCKERHUB_USERNAME }}/netflix-clone:latest
+            ${{ env.DOCKERHUB_USERNAME }}/netflix-clone:${{ github.sha }}
+
+      # 6️⃣ Copy Kubernetes manifests
+      - name: Copy Kubernetes manifests
+        run: |
+          mkdir -p manifests
+          cp -r K8-manifest/*.yaml manifests/
+
+      # 7️⃣ Update deployment.yaml with new image
+      - name: Update Deployment Image Tag
+        run: |
+          sed -i "s|image: .*|image: ${{ env.DOCKERHUB_USERNAME }}/netflix-clone:${{ github.sha }}|" manifests/deployment.yaml
+
+      # 8️⃣ Azure login
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # 9️⃣ Set AKS context
+      - name: Set AKS context
+        run: |
+          az aks get-credentials \
+            --resource-group demo-rg \
+            --name MyAKSCluster
+
+      # 🔟 Determine namespace based on branch
+      - name: Set Deployment Namespace
+        id: set-namespace
+        run: |
+          if [[ "${GITHUB_REF##*/}" == "master" ]]; then
+            echo "namespace=prod" >> $GITHUB_ENV
+          else
+            echo "namespace=dev" >> $GITHUB_ENV
+
+      # 1️⃣1️⃣ Create namespace if missing
+      - name: Create namespace if missing
+        run: |
+          kubectl get namespace ${{ env.namespace }} || kubectl create namespace ${{ env.namespace }}
+
+      # 1️⃣2️⃣ Deploy to AKS
+      - name: Deploy to AKS
+        run: |
+          DEPLOYMENT_NAME="netflix-clone-deployment"
+          kubectl apply -f manifests/deployment.yaml -n ${{ env.namespace }}
+          kubectl apply -f manifests/service.yaml -n ${{ env.namespace }}
+          kubectl rollout status deployment/$DEPLOYMENT_NAME -n ${{ env.namespace }}
+
+      # 1️⃣3️⃣ Optional: Show service IP
+      - name: Check Service Status
+        run: |
+          kubectl get svc netflix-clone-service -n ${{ env.namespace }}
