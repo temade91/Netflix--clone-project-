@@ -49,7 +49,7 @@ jobs:
       - name: Copy Kubernetes manifests
         run: |
           mkdir -p manifests
-          cp -r K8-manifest/*.yaml manifests/
+          cp -r k8-manifest/*.yaml manifests/
 
       # 7️⃣ Update deployment.yaml with new image
       - name: Update Deployment Image Tag
