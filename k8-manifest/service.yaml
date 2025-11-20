@@ -3,10 +3,13 @@ kind: Service
 metadata:
   name: netflix-clone-service
 spec:
-  type: LoadBalancer   # Use NodePort if running locally
+  type: LoadBalancer
   selector:
     app: netflix-clone
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  - protocol: TCP
+    port: 443
+    targetPort: 80
