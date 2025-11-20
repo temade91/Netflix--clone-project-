@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: netflix-clone
-          image: netflix-clone:latest
+          image: temade91/netflix-clone:latest
+
           ports:
             - containerPort: 80
           resources:
