@@ -27,5 +27,5 @@ This project demonstrates a **Netflix Clone** application deployed on **Azure Ku
 
 ---
 
-## Repository Structure
+
 
