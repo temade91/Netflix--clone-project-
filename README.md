@@ -1,4 +1,4 @@
-# Netflix Clone - CI/CD Pipeline
+# Netflix Clone - Project
 
 This project demonstrates a **Netflix Clone** application deployed on **Azure Kubernetes Service (AKS)** with a **GitHub Actions CI/CD pipeline**. Docker images are built, pushed to DockerHub, and deployed automatically to AKS based on branch (master → production, release → development).
 
